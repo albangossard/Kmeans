@@ -6,12 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef int data;
-
 struct Pt{
     double x,y;
     int id_cluster;
-    data dat;
 };
 
 struct Cluster{
@@ -22,13 +19,13 @@ class Kmean{
 public:
     int nbPts;
     int nbCluster;
-    // int nIter;
     Pt * pts;
     Cluster * means;
-    void recursive(int nIter);
+    int recursive(int nIter);
     void init();
-    Kmean(int nbPts, Pt * pts, int nbCluster);
+    Kmean(int nbPts, double * xPts, double * yPts, int nbCluster, int iterMax = 1000);
     void printClustering();
+    int compute(double * xMeans, double * yMeans, double * idCluster);
 };
 
 #endif

@@ -7,4 +7,5 @@ add_executable(
         Kmeans
         kmeans.h
         kmeans.cpp
+        example.cpp
 )

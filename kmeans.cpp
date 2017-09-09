@@ -29,17 +29,14 @@ void Kmean::init(){
         this->means[i].x = this->pts[listSelected[i]].x;
         this->means[i].y = this->pts[listSelected[i]].y;
     }
-    cout<<"### init means ###"<<endl;
-    for (int i=0; i<this->nbCluster; i++){
-        cout<<this->means[i].x<<" "<<this->means[i].y<<endl;
-    }
-    cout<<endl;
+    // cout<<"### init means ###"<<endl;
+    // for (int i=0; i<this->nbCluster; i++){
+    //     cout<<this->means[i].x<<" "<<this->means[i].y<<endl;
+    // }
+    // cout<<endl;
 }
 
-void Kmean::recursive(int nIter){
-    // if (n_iter==0){
-    //     init(Pt * pts);
-    // }
+int Kmean::recursive(int nIter){
     double d,d2;
     int idClusterNearest;
     for (int i=0; i<this->nbPts; i++){
@@ -68,7 +65,7 @@ void Kmean::recursive(int nIter){
         nPerCluster[this->pts[i].id_cluster]+=1;
     }
     bool converged=true;
-    double eps=1e-7;
+    double eps=1e-10;
     for (int j=0; j<this->nbCluster; j++){
         if (nPerCluster[j]==0){
             cout<<"Warning : 0 pts in cluster "<<j<<endl; }
@@ -83,22 +80,31 @@ void Kmean::recursive(int nIter){
         this->means[j].x=xMeans[j];
         this->means[j].y=yMeans[j];
     }
-    cout<<endl<<"################ Iteration "<<nIter<<" ################"<<endl;
-    this->printClustering();
+    // cout<<endl<<"################ Iteration "<<nIter<<" ################"<<endl;
+    // this->printClustering();
+    int ret;
     if (nIter>=20){
         cout<<"Max iteration number reached !"<<endl;
+        ret=-1;
     }else{
         if (!converged){
-            this->recursive(nIter+1);
+            ret = this->recursive(nIter+1) + 1;
+        }else{
+            ret = nIter;
         }
     }
+    return ret;
 }
 
-Kmean::Kmean(int nbPts, Pt * pts, int nbCluster){
+Kmean::Kmean(int nbPts, double * xPts, double * yPts, int nbCluster, int iterMax){
     this->nbPts=nbPts;
     this->nbCluster=nbCluster;
-    // this->pts = (Pt *) malloc(sizeof(Pt)*this->nbPts);
     this->pts=pts;
+    this->pts=(Pt *) malloc(sizeof(Pt)*this->nbPts);
+    for (int i=0; i<this->nbPts; i++){
+        this->pts[i].x=xPts[i];
+        this->pts[i].y=yPts[i];
+    }
     this->means = (Cluster *) malloc(sizeof(Cluster)*this->nbCluster);
 }
 
@@ -112,26 +118,17 @@ void Kmean::printClustering(){
             }
         }
     }
-    cout<<endl;
 }
 
-int main(){
-    int nbPts=10;
-    int nbCluster=3;
-    Pt * pts;
-    pts = (Pt *) malloc(sizeof(Pt)*nbPts);
-    pts[0].x=5; pts[0].y=0.5;
-    pts[1].x=6; pts[1].y=2;
-    pts[2].x=5; pts[2].y=2.5;
-    pts[3].x=1; pts[3].y=4;
-    pts[4].x=0; pts[4].y=3;
-    pts[5].x=1.5; pts[5].y=4.5;
-    pts[6].x=6; pts[6].y=6;
-    pts[7].x=6; pts[7].y=5;
-    pts[8].x=6; pts[8].y=7;
-    pts[9].x=5; pts[9].y=6;
-    Kmean a(nbPts,pts,nbCluster);
-    a.init();
-    a.recursive(0);
-    return 0;
+int Kmean::compute(double * xMeans, double * yMeans, double * idCluster){
+    this->init();
+    int ret = this->recursive(0);
+    for (int j=0; j<this->nbCluster; j++){
+        xMeans[j]=this->means[j].x;
+        yMeans[j]=this->means[j].y;
+    }
+    for (int i=0; i<this->nbPts; i++){
+        idCluster[i]=this->pts[i].id_cluster;
+    }
+    return ret;
 }
