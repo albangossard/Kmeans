@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <list>
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef int data;
 
@@ -23,9 +25,10 @@ public:
     // int nIter;
     Pt * pts;
     Cluster * means;
-    void recursive();
+    void recursive(int nIter);
     void init();
-    Kmean();
-}
+    Kmean(int nbPts, Pt * pts, int nbCluster);
+    void printClustering();
+};
 
 #endif
